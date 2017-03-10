@@ -1,0 +1,7 @@
+{
+  "name": "epoly",
+  "short_name": "epoly",
+  "description": "electron, polymer, j5 test",
+  "start_url": "/",
+  "display": "standalone"
+}

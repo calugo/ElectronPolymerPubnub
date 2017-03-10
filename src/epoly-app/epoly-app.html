@@ -1,0 +1,409 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/highcharts-chart/highcharts-chart.html">
+<link rel="import" href="../../bower_components/paper-divider/paper-divider.html">
+<dom-module id="epoly-app">
+  <template>
+    <style is="custom-style">
+      :host {
+        display: block;
+      }
+
+      #container{
+        display: flex;
+      }
+
+      #hccontainer{
+        display: flex;
+      }
+
+      highcharts-chart {
+       height: 300px;
+       width: 400px;
+       }
+
+      paper-divider.divider-for-light-background {
+         --paper-divider-color: #000;
+       }
+
+    </style>
+    <!--h2>Hello [[prop1]]</h2-->
+    <div id="container">
+    <paper-button toggles raised noink disabled="[[onswitch]]" on-click="plotswitch">[[startmsg]]</paper-button>
+    <paper-button toggles raised noink disabled="[[onswitchx]]" on-click="savebool">Record</paper-button>
+    <paper-button  raised  noink disabled="[[onswitchxx]]" on-click="loaddata">Load</paper-button>
+    <paper-button toggles raised disabled="[[onswitch]]" on-click="pubnubpush">IoT</paper-button>
+    <paper-button toggles raised noink disabled="[[onswitch]]" on-click="ledlight">LED</paper-button>
+    </div>
+    <paper-divider class="divider-for-light-background"></paper-divider>
+    <paper-divider class="divider-for-light-background"></paper-divider>
+    <paper-divider class="divider-for-light-background"></paper-divider>
+    <paper-divider class="divider-for-light-background"></paper-divider>
+    <div id="hccontainer">
+     <highcharts-chart id="hcplot"
+     type="line"
+     plot-options=[[plotOptions]]
+     title="Sensor A0 time-series"
+     x-axis=[[xoptions]]
+     y-axis=[[yoptions]]
+     ></highcharts-chart>
+    </div>
+  </template>
+
+  <script>
+    Polymer({
+
+      is: 'epoly-app',
+
+      properties: {
+        prop1: {
+          type: String,
+          value: 'epoly-app',
+        },
+
+        startmsg:{
+          type: String,
+          value: 'Start',
+          notify: true,
+        },
+
+        xoptions:{
+          type: Object,
+          value:{
+            //min: 0,
+            maxPadding: 0.05,
+            minPadding: 0.05,
+            //hendOnTick: false,
+            //tickAmount: 10,
+            //type: 'datetime',
+            //tickPixelInterval: 150,
+            //maxZoom: 20 * 1000
+          },
+          notify:true,
+        },
+
+        yoptions:{
+          type: Object,
+          value:{
+            min: -1.0,
+            max: 5.5,
+            tickAmount: 8,
+          },
+          notify: true,
+        },
+
+        plotOptions:{
+          type:Object,
+          value:{
+                  line: {
+                    marker: {
+                       enabled: false,
+                    }
+                 }
+               },
+        },
+
+        xdata:{
+           type: Array,
+           value: new Array(300).fill(0),
+        },
+
+        ydata:{
+          type: Array,
+          value: new Array(300).fill(0),
+        },
+
+        tseries:{
+          type: Array,
+          value: [],
+
+        },
+
+        pltindex:{
+          type: Number,
+          value: 0,
+        },
+
+        logindex:{
+          type: Number,
+          value: 0,
+        },
+
+        onswitch:{
+          type: Boolean,
+          value: true,
+          notify: true,
+        },
+
+        onswitchx:{
+          type: Boolean,
+          value: true,
+          notify: true,
+        },
+
+        onswitchxx:{
+          type: Boolean,
+          value: true,
+          notify: true,
+        },
+
+        drawswitch:{
+          type: Boolean,
+          value: false,
+          notify: true,
+          observer: 'plotdata',
+        },
+
+        saveswitch:{
+          type: Boolean,
+          value: false,
+          notify: true,
+          observer: 'savedata'
+        },
+
+        loadswitch:{
+          type: Boolean,
+          value: false,
+          notify: true,
+          //observer: 'loaddata'
+        },
+
+        led:{
+          type:Object,
+          notify:true,
+        },
+
+        sensor:{
+          type:Object,
+          notify:true,
+        },
+
+        freq:{
+          value: 1
+        },
+
+        wstream:{
+          type:Object,
+          notify:true,
+        },
+
+        fname:{
+          type:String,
+          value:'',
+          notify:true,
+        },
+
+        pnubswitch:{
+          type: Boolean,
+          value: false,
+        },
+
+        pnub:{
+          type:Object,
+          notify:true,
+        }
+
+      },
+
+      ready: function(){
+
+        console.log("READY")
+        var Readable = require("stream").Readable;
+        var util = require("util");
+        util.inherits(MyStream, Readable);
+        function MyStream(opt) {
+          Readable.call(this, opt);
+        }
+        MyStream.prototype._read = function() {};
+        // hook in our stream
+        process.__defineGetter__("stdin", function() {
+          if (process.__stdin) return process.__stdin;
+          process.__stdin = new MyStream();
+          return process.__stdin;
+        });
+
+        var five = require("johnny-five");
+        var pub = require("pubnub")
+        var board = new five.Board({
+          repl: false // does not work with browser console
+        });
+        _this=this
+        board.on("ready", function() {
+          this.samplingInterval(100);
+          console.log('%cArduino ready, click button LED to toggle onboard LED.', 'color: green;');
+          _this.onswitch=false
+          _this.onswitchxx=false
+          // Create a standard `led` component instance
+          _this.led={
+             instace: new five.Led(13)
+           }
+
+          _this.sensor={
+            instance: new five.Sensor({pin: 'A0', freq: _this.freq})
+          }
+
+          _this.pnub = {
+             instance: new pub({
+               publish_key: 'pub-c-f36b6693-3670-4288-ad29-63335c57dcf7',
+               subscribe_key: 'sub-c-0c5d50ea-fb04-11e6-8fcb-0619f8945a4f',
+               ssl: true
+               //no_wait_for_pending: true,
+             })
+           }
+        });
+
+      },
+
+      plotswitch: function(){
+        //console.log("hello")
+         this.drawswitch =  !this.drawswitch
+         if (this.drawswitch==true){
+           this.startmsg='Stop'
+           this.onswitchx=false
+         }
+         if (this.drawswitch==false){
+           this.startmsg='Start'
+           this.onswitchx=true
+         }
+      },
+
+      savebool: function(){
+         //console.log(this.saveswitch)
+         this.saveswitch =  !this.saveswitch
+         //console.log(this.saveswitch)
+         //if (this.saveswitch==true){console.log("RECORDING")}
+         //if (this.saveswitch==false){console.log("NOT RECORDING")}
+      },
+
+
+      plotdata: function(){
+        if ((this.sensor)&&(this.sensor.instance)){
+        _this=this
+
+
+        this.sensor.instance.scale(0,5).on('data', function(){
+        if (_this.drawswitch==true){
+            _this.tseries.push([_this.pltindex*(_this.freq/1000.0),_this.sensor.instance.value])
+          //  console.log(_this.pltindex*(_this.freq/1000.0))
+            if(_this.pltindex>500){
+            _this.tseries.shift()
+            }
+            if (_this.pltindex%2==0){
+            _this.$.hcplot.reRender()
+            _this.$.hcplot.setData(_this.tseries)
+            }
+
+            //if((_this.saveswitch==true) && (_this.logindex==0)){
+          //    console.log("logging!")
+          //    fs = require('fs');
+          //    var path = './Logs/log'+_this.logindex.toString()
+          //    var ws = fs.createWriteStream(path)
+          //    _this.logindex++
+          //  }
+
+            if((_this.saveswitch==true) && (_this.logindex>0)){
+               var obj = {
+                'sensor': _this.sensor.instance.value.toFixed(5),
+                //'output': ledValue.toFixed(2),
+                //'output': sensorValue.toFixed(2),
+                //'index': i,
+                //'time' : now().toFixed(2)
+               }
+               //console.log(obj.sensor)
+               _this.wstream.instance.write(obj.sensor+'\n')
+             }
+           ///////////////////////////////////////
+            if(_this.pnubswitch==true){
+
+              var datax = {
+              'temperature': _this.sensor.instance.value,
+              }
+              _this.pnub.instance.publish({
+               channel: 'temperature-ds18b20',
+               message: datax,
+               });
+            }
+          ////////////////////////////////////////////
+            _this.pltindex++
+          }
+        })
+       }
+      },
+
+      ledlight: function(){
+        this.led.instace.toggle()
+      },
+
+      savedata: function(){
+        if(this.saveswitch==true){
+         //console.log("hola")
+         fs = require('fs')
+         var path = './Logs/log'+_this.logindex.toString()+'.dat'
+         this.wstream={
+           instance: fs.createWriteStream(path)
+        //    _this.logindex++
+          }
+          this.logindex++
+          //console.log(this.sensor.instance.value.toFixed(2))
+        }
+        if((this.logindex>0) && (this.saveswitch==false)){
+          console.log("bye")
+          this.wstream.instance.end()
+        }
+
+      },
+
+      loadlog: function(){
+        //console.log("loading")
+        this.onswitchxx=!this.onswitchxx
+      },
+
+      loaddata: function(){
+        var app = require('electron').remote;
+        var dialog = app.dialog;
+        _this=this
+        dialog.showOpenDialog({ filters: [{ name: 'data', extensions: ['dat'] }]},
+         function (fileNames) {
+        // fileNames is an array that contains all the selected
+          if(fileNames === undefined){
+            console.log("No file selected");
+          }else{
+            console.log(fileNames[0]);
+            fs = require('fs')
+            var array = fs.readFileSync(fileNames[0]).toString().split("\n");
+            var tarray=[]
+            //var j=0
+            //console.log(array)
+            for(i in array) {
+              //console.log(i)
+              tarray.push([_this.freq*(i/1000.0),parseFloat(array[i])])
+              //j++
+             }
+             //console.log(tarray)
+             _this.$.hcplot.reRender()
+             _this.$.hcplot.setData(tarray)
+          }
+        });
+
+      },
+
+       pubnubpush: function(){
+        console.log("PuBNub TEst")
+        console.log(this.pnubswitch)
+        this.pnubswitch=!this.pnubswitch
+
+        console.log(this.pnubswitch)
+
+        //var pnobj = {
+        // 'sensor': this.sensor.instance.value.toFixed(5),
+         //'output': ledValue.toFixed(2),
+         //'output': sensorValue.toFixed(2),
+         //'index': i,
+         //'time' : now().toFixed(2)
+        //}
+        //console.log(pnobj.sensor)
+      }
+
+    });
+  </script>
+</dom-module>

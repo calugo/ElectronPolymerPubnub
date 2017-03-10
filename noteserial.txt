@@ -1,0 +1,2 @@
+sudo  HOME=~/.electron-gyp node-gyp rebuild --target=`npm view electron version` --arch=x64 --dist http://atom.io/download/atom-shell
+
