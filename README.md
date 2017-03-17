@@ -14,9 +14,10 @@ npm install -g electron
 First, hook up your Arduino with Firmata loaded on to it.
 Next, clone this repository and install the dependencies:
 ```bash
-git clone https://github.com/leoweigand/electron-arduino-quickstart.git
+git clone https://github.com/calugo/ElectronPolymerPubnub.git
 cd electron-arduino-quickstart
 npm install
+bower install
 ```
 Use `npm start` to run your app and you are ready to go!
   
