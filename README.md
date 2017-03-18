@@ -1,6 +1,6 @@
 # Quickstart for Electron and Arduino and Polymer components.
 
-![](https://rawgit.com/leoweigand/electron-arduino-quickstart/master/poster.png)
+![](https://github.com/calugo/ElectronPolymerPubnub/blob/master/poster2.png)
 This repository is a quick-start for using [Arduino](https://www.arduino.cc/) with [Electron](http://electron.atom.io/) and [Johnny-Five](http://johnny-five.io/), which is a great way to get started with hardware prototyping in JavaScript. It is loosely based on the [electron-quickstart](https://github.com/electron/electron-quick-start) repository and follows a [tutorial](http://meow.noopkat.com/using-johnny-five-within-an-electron-app/) by @noopkat.
 
 ## Prerequisites
