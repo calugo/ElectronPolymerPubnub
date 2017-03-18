@@ -24,7 +24,7 @@ First, hook up your Arduino with Firmata loaded on to it.
 Next, clone this repository and install the dependencies:
 ```bash
 git clone https://github.com/calugo/ElectronPolymerPubnub.git
-cd electron-arduino-quickstart
+cd ElectronPolymerPubnub
 npm install
 bower install
 ```
