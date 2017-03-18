@@ -8,7 +8,7 @@ This project is heavily inspired in the great repos of [leoweigand](https://gith
 
 ## OS notes
 
-It works oaut of the box in Linux and OSX, I have not try in Windows, I really hope to be able to provide installers at some point.
+The app works out of the box in Linux and OSX, I have not tried out in Windows. I really hope to be able to provide installers at some point.
 
 Below there are instructions I ripped off from [leoweigand's](https://github.com/leoweigand/electron-arduino-quickstart) README.
 
