@@ -2,7 +2,7 @@
 
 ![](https://github.com/calugo/ElectronPolymerPubnub/blob/master/poster2.png)
 
-This contains code for a little electron desktop application to plot, log, and stream data via PubNub from an Arduino board, the GUI is built using Polymer (1.x) components. It is always work in progress.
+This repo contains code for a little electron desktop application to plot, log, and stream data via PubNub from an Arduino board, the GUI is built using Polymer (1.x) components. It is always work in progress.
 
 This project is heavily inspired in the great repos of  and [sofroniewn](https://github.com/sofroniewn/electron-johnny-five-examples), the former is actually based in a  [tutorial](http://meow.noopkat.com/using-johnny-five-within-an-electron-app/) by @noopkat.
 
