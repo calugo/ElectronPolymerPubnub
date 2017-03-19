@@ -11,11 +11,11 @@ paper-button components and the plot is a [highcharts](https://github.com/avdare
 
 The toggle buttons have the following functionality:
 
-_**start**_ the data stream plot from A0 in the arduino
-_**record**_ record's the data stream and stores it the folder "Logs/" as log0.dat, log1.dat, etc. where the numeric index represents the event of recording since the application started, this should soon will be refined to a date-time format i guess, if you have a log stored, close and restart the application the indexing of the logs will be restarted and any previous log with the same index will be overwritten.
-_**load**_ Loads and plot a log file.
-_**IOT**_ streams the data to a PubNub channel, if you have a set ok keys and a page somewhere, you should change these in the source code or otherwise it will be streamed and plotted to my settings.
-_**LED**_ Hello world to turn on and off the on-board led.
+1. _**start**_ the data stream plot from A0 in the arduino
+1. _**record**_ record's the data stream and stores it the folder "Logs/" as log0.dat, log1.dat, etc. where the numeric index represents the event of recording since the application started, this should soon will be refined to a date-time format i guess, if you have a log stored, close and restart the application the indexing of the logs will be restarted and any previous log with the same index will be overwritten.
+1. _**load**_ Loads and plot a log file.
+1. _**IOT**_ streams the data to a PubNub channel, if you have a set ok keys and a page somewhere, you should change these in the source code or otherwise it will be streamed and plotted to my settings.
+1. _**LED**_ Hello world to turn on and off the on-board led.
 
 There are a lot of things I inted to do to turn this into something more useful but at the moment this is it, if you have and idea or a contribution please share!
 
