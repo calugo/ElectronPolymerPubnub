@@ -40,4 +40,6 @@ If you want to program an Arduino using JavaScript, Johnny-Five and node.js are 
   
 Unfortunately, there are some difficulties to overcome using Electron and the `serialport` library required by Johnny-Five which take time and might be confusing for beginners. As outlined in the tutorial by @noopkat, this repo fixes these problems and provides the boilerplate code for getting started with hardware prototyping in Electron.
 
-# ENJOY!
+# If you succed you should see something like this:
+
+![](https://github.com/calugo/ElectronPolymerPubnub/blob/master/GUI.png)
