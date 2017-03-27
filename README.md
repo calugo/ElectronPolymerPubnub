@@ -1,4 +1,4 @@
-# GUI for data plotting and logging using Electron and Arduino and Polymer components.
+# Desktop GUI for data plotting and logging data streams from an Arduino. It is build using Electron, Johnny-five and Polymer components. Alo has some IoT experimental functionality using PubNub.
 
 ![](https://github.com/calugo/ElectronPolymerPubnub/blob/master/poster2.png)
 
