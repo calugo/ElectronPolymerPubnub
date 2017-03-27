@@ -1,7 +1,8 @@
 {
-  "name": "electron-arduino-quickstart",
+  "name": "Arduino-Logger-Plotter",
   "version": "1.0.0",
-  "description": "Boilerplate for getting started with Arduino and Electron",
+  "description": "GUI for Arduino Sensors to display and log data using Johhny five's sensor class. It is build using
+Electron and Polymer webcomponents and allows data streaming to remote url's via PubNub",
   "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -10,21 +11,20 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/leoweigand/electron-arduino-quickstart.git"
+    "url": "https://github.com/calugo/ElectronPolymerPubnub.git"
   },
-  "author": "Leo Weigand",
+  "author": "Carlos A Lugo",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/leoweigand/electron-arduino-quickstart/issues"
+    "url": "https://github.com/calugo/ElectronPolymerPubnub/issues"
   },
-  "homepage": "https://github.com/leoweigand/electron-arduino-quickstart#readme",
+  "homepage": "https://github.com/calugo/ElectronPolymerPubnub",
   "devDependencies": {
     "electron": "^1.4.15",
     "electron-rebuild": "^1.5.7"
   },
   "dependencies": {
     "johnny-five": "^0.10.6",
-    "pubnub": "^3.15.2",
-    "three": "^0.84.0"
+    "pubnub": "^3.15.2"
   }
 }

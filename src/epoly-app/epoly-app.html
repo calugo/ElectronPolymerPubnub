@@ -2,6 +2,11 @@
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/highcharts-chart/highcharts-chart.html">
 <link rel="import" href="../../bower_components/paper-divider/paper-divider.html">
+<link rel="import" href="../../bower_components/paper-toolbar/paper-toolbar.html">
+<link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
+<link rel="import" href="../../bower_components/paper-spinner/paper-spinner-lite.html">
+<link rel="import" href="../../bower_components/paper-checkbox/paper-checkbox.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout.html">
 <dom-module id="epoly-app">
   <template>
     <style is="custom-style">
@@ -17,6 +22,25 @@
         display: flex;
       }
 
+      .flex-equal-around-justified {
+        @apply(--layout-horizontal);
+        @apply(--layout-around-justified);
+      }
+
+      .flex-equal-justified {
+      @apply(--layout-horizontal);
+      @apply(--layout-justified);
+      }
+
+      paper-button.blue {
+       }
+
+      paper-button.blue[active] {
+         background-color: var(--paper-red-500);
+       }
+
+
+
       highcharts-chart {
        height: 300px;
        width: 400px;
@@ -26,28 +50,86 @@
          --paper-divider-color: #000;
        }
 
+      paper-spinner, paper-spinner-lite {
+          margin: 8px 8px 8px 8px;
+      }
+
+      paper-spinner-lite.white {
+        --paper-spinner-color: var(--google-white-500);
+     }
+
+     paper-checkbox {
+        margin: 24px;
+      }
     </style>
-    <!--h2>Hello [[prop1]]</h2-->
+
+    <div id="msgcons">
+
+      <paper-toolbar>
+        <span>[[readymsg]]</span>
+        <paper-spinner-lite active=[[readyflag]] class="white"></paper-spinner-lite>
+     </paper-toolbar>
+
+    </div>
+
+    <paper-divider class="divider-for-light-background"></paper-divider>
+    <paper-divider class="divider-for-light-background"></paper-divider>
+    <paper-divider class="divider-for-light-background"></paper-divider>
+    <paper-divider class="divider-for-light-background"></paper-divider>
     <div id="container">
-    <paper-button toggles raised noink disabled="[[onswitch]]" on-click="plotswitch">[[startmsg]]</paper-button>
-    <paper-button toggles raised noink disabled="[[onswitchx]]" on-click="savebool">Record</paper-button>
+
+    <paper-button class="custom blue" toggles raised noink disabled="[[onswitchplt]]" on-click="plotswitch">[[startmsg]]</paper-button>
+    <paper-button class="custom blue" toggles raised noink disabled="[[onswitchx]]" on-click="savebool">Record</paper-button>
     <paper-button  raised  noink disabled="[[onswitchxx]]" on-click="loaddata">Load</paper-button>
-    <paper-button toggles raised disabled="[[onswitch]]" on-click="pubnubpush">IoT</paper-button>
-    <paper-button toggles raised noink disabled="[[onswitch]]" on-click="ledlight">LED</paper-button>
+    <paper-button class="custom blue" toggles raised disabled="[[onswitchpnub]]" on-click="pubnubpush">IoT</paper-button>
+    <paper-button class="custom blue" toggles raised noink disabled="[[onswitch]]" on-click="ledlight">LED</paper-button>
+    <!-- paper-button toggles raised noink disabled="[[ttrace]]" on-click="plotswitch">time-trace</paper-button>
+    <paper-button toggles raised noink disabled="[[xytrace]]" on-click="savebool">X-Y</paper-button -->
     </div>
     <paper-divider class="divider-for-light-background"></paper-divider>
     <paper-divider class="divider-for-light-background"></paper-divider>
     <paper-divider class="divider-for-light-background"></paper-divider>
     <paper-divider class="divider-for-light-background"></paper-divider>
-    <div id="hccontainer">
-     <highcharts-chart id="hcplot"
+
+
+    <div id="hccontainer" class="container flex-equal-around-justified">
+
+     <div> <highcharts-chart id="hcplot"
      type="line"
      plot-options=[[plotOptions]]
-     title="Sensor A0 time-series"
+     title=[[tseriestitle]]
+     x-label="time"
+     y-label=[[tseriesylabel]]
      x-axis=[[xoptions]]
      y-axis=[[yoptions]]
-     ></highcharts-chart>
+     ></highcharts-chart></div>
+     <div><highcharts-chart id="xyhcplot"
+       type="scatter"
+       plot-options=[[plotOptionsy]]
+       title=[[xytitle]]
+       x-label=[[xyxlabel]]
+       y-label=[[xyylabel]]
+       x-axis=[[xoptions]]
+       y-axis=[[yoptions]]
+       ></highcharts-chart>
+     </div>
     </div>
+    <paper-divider class="divider-for-light-background"></paper-divider>
+    <paper-divider class="divider-for-light-background"></paper-divider>
+    <paper-divider class="divider-for-light-background"></paper-divider>
+    <paper-divider class="divider-for-light-background"></paper-divider>
+    <div id="chcontainer">
+      <paper-toolbar>
+          <!--div>Active Inputs:[[this.chmsg]]</div><br></br -->
+          <paper-checkbox id="a0" noink disabled="[[pinArray.s0]]" on-change="ch0">A0</paper-checkbox>
+          <paper-checkbox id="a1" noink disabled="[[pinArray.s1]]" on-change="ch1">A1</paper-checkbox>
+          <paper-checkbox id="a2" noink disabled="[[pinArray.s2]]" on-change="ch2">A2</paper-checkbox>
+          <paper-checkbox id="a3" noink disabled="[[pinArray.s3]]" on-change="ch3">A3</paper-checkbox>
+          <paper-checkbox id="a4" noink disabled="[[pinArray.s4]]" on-change="ch4">A4</paper-checkbox>
+          <paper-checkbox id="a5" noink disabled="[[pinArray.s5]]" on-change="ch5">A5</paper-checkbox>
+      </paper-toolbar>
+    </div>
+
   </template>
 
   <script>
@@ -85,8 +167,8 @@
         yoptions:{
           type: Object,
           value:{
-            min: -1.0,
-            max: 5.5,
+            //min: 150.0,
+            //max: 250.5,
             tickAmount: 8,
           },
           notify: true,
@@ -95,12 +177,53 @@
         plotOptions:{
           type:Object,
           value:{
-                  line: {
-                    marker: {
-                       enabled: false,
-                    }
-                 }
-               },
+                  line:{
+                    marker:{
+                      radius: 1
+                          }
+                        }
+                },
+        },
+
+        plotOptionsy:{
+            type:Object,
+            value:{
+                    scatter:{
+                      marker:{
+                        radius: 1
+                            }
+                          }
+                  },
+          },
+
+        tseriestitle:{
+          type: String,
+          value: 'title1'
+
+        },
+
+        tseriesylabel:{
+          type: String,
+          value: "Sensor/s value"
+        },
+
+        ptcase:{
+          type: Number,
+          value: 0
+        },
+
+        xytitle:{
+          type: String,
+          value: 'title2'
+        },
+
+        xyxlabel:{
+          type:String,
+          value: "Sensor value"
+        },
+        xyylabel:{
+           type:String,
+           value: "Sensor value"
         },
 
         xdata:{
@@ -118,7 +241,17 @@
           value: [],
 
         },
+        tseriesy:{
+          type: Array,
+          value: [],
 
+        },
+
+        tseriesxy:{
+          type: Array,
+          value: [],
+
+        },
         pltindex:{
           type: Number,
           value: 0,
@@ -146,6 +279,16 @@
           value: true,
           notify: true,
         },
+        onswitchplt:{
+          type: Boolean,
+          value: true,
+          notify: true,
+        },
+        onswitchpnub:{
+          type: Boolean,
+          value: true,
+          notify: true,
+        },
 
         drawswitch:{
           type: Boolean,
@@ -168,6 +311,7 @@
           //observer: 'loaddata'
         },
 
+
         led:{
           type:Object,
           notify:true,
@@ -178,8 +322,13 @@
           notify:true,
         },
 
+        sensory:{
+          type:Object,
+          notify:true,
+        },
+
         freq:{
-          value: 1
+          value: 20
         },
 
         wstream:{
@@ -201,7 +350,57 @@
         pnub:{
           type:Object,
           notify:true,
-        }
+        },
+
+       ttrace:{
+         type: Boolean,
+         value: true
+       },
+
+       xytrace:{
+         type: Boolean,
+         value: true,
+       },
+
+       chmsg: {
+        type:String,
+        value:'',
+      },
+
+       readymsg: {
+       type:String,
+       value:'Setting up Board',
+      },
+
+      readyflag: {
+       type: Boolean,
+       value:true,
+     },
+
+      pinArray: {
+        type: Object,
+        value:{
+          s0: true,
+          s1: true,
+          s2: true,
+          s3: true,
+          s4: true,
+          s5: true
+        },
+        notify: true,
+
+      }  ,
+
+      pincount:{
+        type: Array,
+        value: new Array(6).fill(0)
+      },
+
+      go:{
+        type: Number,
+        value: 0,
+        observer: 'gofunc'
+      }
 
       },
 
@@ -229,18 +428,35 @@
         });
         _this=this
         board.on("ready", function() {
-          this.samplingInterval(100);
+           this.samplingInterval(1);
+          _this.readyflag=false
           console.log('%cArduino ready, click button LED to toggle onboard LED.', 'color: green;');
+          _this.readymsg='Arduino ready - Click LED to toggle onboard LED or select the sensor PINs below'
+
           _this.onswitch=false
           _this.onswitchxx=false
+
+
+          for(var i=0 ; i<6; i++) {
+            var uk="a"+i.toString()
+            _this.$[uk].disabled=false
+          }
+          //if ((_this.go==1) || (_this.go==2)){
+          //_this.onswitch=false
+          //_this.onswitchxx=false
+          //}
           // Create a standard `led` component instance
           _this.led={
              instace: new five.Led(13)
            }
 
-          _this.sensor={
-            instance: new five.Sensor({pin: 'A0', freq: _this.freq})
-          }
+          //_this.sensor={
+          //  instance: new five.Sensor({pin: 'A0', freq: _this.freq})
+          //}
+
+          //_this.sensory={
+          //  instance: new five.Sensor({pin: 'A1', freq: _this.freq})
+          //}
 
           _this.pnub = {
              instance: new pub({
@@ -260,10 +476,12 @@
          if (this.drawswitch==true){
            this.startmsg='Stop'
            this.onswitchx=false
+           this.onswitchxx=true
          }
          if (this.drawswitch==false){
            this.startmsg='Start'
            this.onswitchx=true
+           this.onswitchxx=false
          }
       },
 
@@ -277,15 +495,48 @@
 
 
       plotdata: function(){
-        if ((this.sensor)&&(this.sensor.instance)){
+        var sid=[]
+
+        if(this.pincount){
+        for(var i=0;i<6;i++) {
+          if(this.pincount[i]==1){
+          var uk="A"+i.toString()
+          sid.push(uk)}}}
+        this.ptcase=sid.length
+
+        if (sid.length==1){
+          //this.sensor.
+          var five = require("johnny-five");
+          this.sensor={
+            instance: new five.Sensor({pin: sid[0], freq: this.freq})
+          }
+        }
+
+
+        if (sid.length==2){
+          var five = require("johnny-five");
+          this.sensor={
+            instance: new five.Sensor({pin: sid[0], freq: this.freq})
+          }
+          this.sensory={
+            instance: new five.Sensor({pin: sid[1], freq: this.freq})
+          }
+
+        }
+////////////////////////////////////////////////////////////////////////////
+        if ((this.sensor)&&(this.sensor.instance)&&(sid.length==1)){
         _this=this
-
-
-        this.sensor.instance.scale(0,5).on('data', function(){
+        this.tseriestitle=sid[0]+" time-series"
+        this.tseriesylabel=sid[0]+" value"
+        //this.$.hpcplot=sid[0]+" time-series"
+        this.sensor.instance.on('data', function(){
         if (_this.drawswitch==true){
             _this.tseries.push([_this.pltindex*(_this.freq/1000.0),_this.sensor.instance.value])
-          //  console.log(_this.pltindex*(_this.freq/1000.0))
-            if(_this.pltindex>500){
+//            _this.tseries.push([_this.sensor.instance.value,_this.sensory.instance.value])
+            //console.log(_this.pltindex*(_this.freq/1000.0))
+            //console.log(_this.sensor.instance.value)
+            //console.log(_this.sensory.instance.value)
+            if(_this.pltindex>100){
             _this.tseries.shift()
             }
             if (_this.pltindex%2==0){
@@ -293,13 +544,13 @@
             _this.$.hcplot.setData(_this.tseries)
             }
 
-            //if((_this.saveswitch==true) && (_this.logindex==0)){
-          //    console.log("logging!")
-          //    fs = require('fs');
-          //    var path = './Logs/log'+_this.logindex.toString()
-          //    var ws = fs.createWriteStream(path)
-          //    _this.logindex++
-          //  }
+            if((_this.saveswitch==true) && (_this.logindex==0)){
+              //console.log("logging!")
+              //fs = require('fs');
+              //var path = './Logs/SClog'+_this.logindex.toString()
+              //var ws = fs.createWriteStream(path)
+              _this.logindex++
+            }
 
             if((_this.saveswitch==true) && (_this.logindex>0)){
                var obj = {
@@ -328,6 +579,73 @@
           }
         })
        }
+       //////////////////////////////////////////////////////
+       if ( ((this.sensor)&&(this.sensor.instance))&&(sid.length==2)&& ((this.sensory)&&(this.sensory.instance))){
+         _this=this
+         this.tseriestitle=sid[0]+"-"+sid[1] +" time-series"
+         this.tseriesylabel=sid[0]+"/"+sid[1]+" values"
+         this.xytitle=" "+sid[0]+" vs "+sid[1]
+         this.xyxlabel=sid[0]+" value"
+         this.xyylabel=sid[1]+" value"
+         this.sensor.instance.on('data', function(){
+         if (_this.drawswitch==true){
+             if(_this.pltindex==0){
+               _this.$.hcplot.addSeries(sid[0])
+               _this.$.hcplot.addSeries(sid[1])
+               _this.$.xyhcplot.addSeries("CUCA")
+             }
+             _this.tseries.push([_this.pltindex*(_this.freq/1000.0),_this.sensor.instance.value])
+             _this.tseriesy.push([_this.pltindex*(_this.freq/1000.0),_this.sensory.instance.value])
+             _this.tseriesxy.push([_this.sensor.instance.value,_this.sensory.instance.value])
+             if(_this.pltindex>100){
+             _this.tseries.shift()
+             _this.tseriesy.shift()
+             }
+             if(_this.pltindex>5000){
+              _this.tseriesxy.shift()
+            }
+               _this.$.hcplot.reRender()
+               _this.$.hcplot.addSeries(sid[0],_this.tseries)
+               _this.$.hcplot.addSeries(sid[1],_this.tseriesy)
+               _this.$.xyhcplot.setData(_this.tseriesxy)
+
+             if((_this.saveswitch==true) && (_this.logindex==0)){
+               //console.log("logging!")
+               //fs = require('fs');
+               //var path = './Logs/TClog'+_this.logindex.toString()
+               //var ws = fs.createWriteStream(path)
+               _this.logindex++
+             }
+
+             if((_this.saveswitch==true) && (_this.logindex>0)){
+                var obj = {
+                 'sensor1': _this.sensor.instance.value.toFixed(5),
+                 'sensor2': _this.sensory.instance.value.toFixed(5)
+                 //'output': ledValue.toFixed(2),
+                 //'output': sensorValue.toFixed(2),
+                 //'index': i,
+                 //'time' : now().toFixed(2)
+                }
+                //console.log(obj.sensor)
+                _this.wstream.instance.write(obj.sensor1+","+obj.sensor2+'\n')
+              }
+            ///////////////////////////////////////
+             if(_this.pnubswitch==true){
+
+               var datax = {
+               'temperature': _this.sensor.instance.value,
+               }
+               _this.pnub.instance.publish({
+                channel: 'temperature-ds18b20',
+                message: datax,
+                });
+             }
+           ////////////////////////////////////////////
+             _this.pltindex++
+           }
+         })
+       }
+       /////////////////////////////////////////////////////
       },
 
       ledlight: function(){
@@ -338,7 +656,12 @@
         if(this.saveswitch==true){
          //console.log("hola")
          fs = require('fs')
-         var path = './Logs/log'+_this.logindex.toString()+'.dat'
+         if(this.ptcase==1){
+           var path = './Logs/SChlog'+_this.logindex.toString()+'.dat'}
+         if(this.ptcase==2){
+           var path = './Logs/TChlog'+_this.logindex.toString()+'.dat'}
+
+
          this.wstream={
            instance: fs.createWriteStream(path)
         //    _this.logindex++
@@ -369,6 +692,7 @@
             console.log("No file selected");
           }else{
             console.log(fileNames[0]);
+            if(fileNames[0].search("/SChlog")>=0){
             fs = require('fs')
             var array = fs.readFileSync(fileNames[0]).toString().split("\n");
             var tarray=[]
@@ -381,7 +705,33 @@
              }
              //console.log(tarray)
              _this.$.hcplot.reRender()
+             _this.tseriestitle="Loaded time-series"
+             _this.tseriesylabel="Loaded Single Sensor Values"
              _this.$.hcplot.setData(tarray)
+           }
+           if(fileNames[0].search("/TChlog")>=0){
+             //console.log("hola")
+             fs = require('fs')
+             var array = fs.readFileSync(fileNames[0]).toString().split("\n")
+             //console.log(array)
+             var tarray1=[]
+             var tarray2=[]
+             for(i in array){
+               //console.log(array[i])
+               //console.log(array[i].split(","))
+               var sn = array[i].split(",")
+               tarray1.push([_this.freq*(i/1000.0),parseFloat(sn[0])])
+               tarray2.push([_this.freq*(i/1000.0),parseFloat(sn[1])])
+             }
+              console.log(tarray1)
+              _this.$.hcplot.reRender()
+              _this.tseriestitle="Loaded time-series"
+              _this.tseriesylabel="Loaded Two Sensor Values"
+              _this.$.hcplot.addSeries("ch1",tarray1)
+              _this.$.hcplot.addSeries("ch2",tarray2)
+             //.toString().split("\n");
+
+           }
           }
         });
 
@@ -402,6 +752,192 @@
          //'time' : now().toFixed(2)
         //}
         //console.log(pnobj.sensor)
+      },
+
+      ch0: function(){
+        console.log("A0")
+        this.pincount[0]=(this.pincount[0]+1)%2
+        var sum = this.pincount.reduce(add, 0);
+        console.log(this.pincount)
+        function add(a, b) {
+          return a + b;
+        }
+        console.log(sum); // 6
+        if (sum == 2){
+          for(var i=0 ; i<6; i++) {
+            //console.log(this.pincount[i])
+            if(this.pincount[i]==0){
+            //var ik="s"+i.toString()
+            var uk="a"+i.toString()
+            //this.pinArray[ik]=true
+            this.$[uk].disabled=true
+           }
+          }
+        }
+
+      if (sum==1){
+          for(var i=0;i<6;i++) {
+            if(this.pincount[i]==0){
+            var uk="a"+i.toString()
+            this.$[uk].disabled=false}
+          }}
+        this.go=sum
+        console.log(this.pinArray)
+      },
+
+      ch1: function(){
+        console.log("A1")
+        this.pincount[1]=(this.pincount[1]+1)%2
+        console.log(this.pincount)
+        var sum = this.pincount.reduce(add, 0);
+        function add(a, b) {
+          return a + b;
+        }
+        console.log(sum); // 6
+        if (sum == 2){
+          for(var i=0; i<6; i++) {
+            if(this.pincount[i]==0){
+             var uk="a"+i.toString()
+             this.$[uk].disabled=true
+            }
+           }
+        }
+
+        if (sum==1){
+          for(var i=0;i<6;i++) {
+            if(this.pincount[i]==0){
+            var uk="a"+i.toString()
+            this.$[uk].disabled=false}
+           }
+         }
+        this.go=sum
+        console.log(this.pinArray)
+      },
+
+      ch2: function(){
+        console.log("A2")
+        this.pincount[2]=(this.pincount[2]+1)%2
+        console.log(this.pincount)
+        var sum = this.pincount.reduce(add, 0);
+        function add(a, b) {
+            return a + b;
+          }
+        console.log(sum); // 6
+        if (sum == 2){
+          for(var i=0;i<6;i++) {
+            if(this.pincount[i]==0){
+            var uk="a"+i.toString()
+            this.$[uk].disabled=true
+            }
+           }
+        }
+        if (sum==1){
+          for(var i=0;i<6;i++) {
+            if(this.pincount[i]==0){
+            var uk="a"+i.toString()
+            this.$[uk].disabled=false}
+          }}
+        this.go=sum
+        console.log(this.pinArray)
+      },
+
+      ch3: function(){
+        console.log("A3")
+        this.pincount[3]=(this.pincount[3]+1)%2
+        console.log(this.pincount)
+        var sum = this.pincount.reduce(add, 0);
+        function add(a, b) {
+            return a + b;
+          }
+        console.log(sum); // 6
+        if (sum == 2){
+          for(var i=0; i<6; i++) {
+            if(this.pincount[i]==0){
+            var uk="a"+i.toString()
+            this.$[uk].disabled=true}
+           }
+        }
+        if (sum==1){
+          for(var i=0;i<6;i++) {
+            if(this.pincount[i]==0){
+            var uk="a"+i.toString()
+            this.$[uk].disabled=false}
+          }}
+        console.log(this.pinArray)
+        this.go=sum
+      },
+
+      ch4: function(){
+        console.log("A4")
+        this.pincount[4]=(this.pincount[4]+1)%2
+        console.log(this.pincount)
+        var sum = this.pincount.reduce(add, 0);
+        function add(a, b) {
+            return a + b;
+          }
+        console.log(sum); // 6
+        if (sum == 2){
+          for(var i=0; i<6; i++) {
+            if(this.pincount[i]==0){
+            var uk="a"+i.toString()
+            this.$[uk].disabled=true}
+           }
+        }
+        if (sum==1){
+          for(var i=0;i<6;i++) {
+            if(this.pincount[i]==0){
+            var uk="a"+i.toString()
+            this.$[uk].disabled=false}
+          }}
+        console.log(this.pinArray)
+        this.go=sum
+      },
+
+      ch5: function(){
+        console.log("A5")
+        this.pincount[5]=(this.pincount[5]+1)%2
+        console.log(this.pincount)
+        var sum = this.pincount.reduce(add, 0);
+        function add(a, b) {
+            return a + b;
+          }
+        console.log(sum); // 6
+        if (sum == 2){
+          for(var i=0;i<6;i++) {
+            if(this.pincount[i]==0){
+            var uk="a"+i.toString()
+            this.$[uk].disabled=true}
+           }
+        }
+
+        if (sum==1){
+          for(var i=0;i<6;i++) {
+            if(this.pincount[i]==0){
+            var uk="a"+i.toString()
+            this.$[uk].disabled=false}
+           }
+        }
+        console.log(this.pinArray)
+        this.go=sum
+      },
+
+      gofunc: function(){
+        if (this.go==1){
+          this.onswitchplt=false
+          this.onswitchpnub=false
+          this.ttrace=false
+          this.xytrace=true
+        }
+        if (this.go==2){
+          this.xytrace=false
+
+        }
+
+        if(this.go==0){
+          this.onswitchplt=true
+          this.onswitchpnub=true
+          this.ttrace=true
+        }
       }
 
     });
