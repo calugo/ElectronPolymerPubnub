@@ -1,8 +1,7 @@
 {
   "name": "Arduino-Logger-Plotter",
   "version": "1.0.0",
-  "description": "GUI for Arduino Sensors to display and log data using Johhny five's sensor class. It is build using
-Electron and Polymer webcomponents and allows data streaming to remote url's via PubNub",
+  "description": "GUI for Arduino Sensors to display and log data using Johhny five's sensor class. It is build using Electron and Polymer webcomponents and allows data streaming to remote url's via PubNub",
   "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
