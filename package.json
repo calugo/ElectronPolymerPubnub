@@ -19,7 +19,7 @@
   },
   "homepage": "https://github.com/calugo/ElectronPolymerPubnub",
   "devDependencies": {
-    "electron": "^1.4.15",
+    "electron": "^9.1.0",
     "electron-rebuild": "^1.5.7"
   },
   "dependencies": {
